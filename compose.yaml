@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+# Laravel services
+  app:
+    build: . # 現在のディレクトリから Dockerfileを利用してイメージビルド
+    image: laravel-vue-crm # ビルドされたイメージの名前
+    container_name: laravel-vue-crm-app
+    restart: unless-stopped #　コンテナが中止されてない限り、自動で再起動
+    tty: true # TTYモード活性化 (ターミナルインタフェースを利用するように設定)
+    ports:
+      - "8080:80"
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    volumes:
+      - .:/var/www # 現在ディレクトリをコンテナの /var/wwwでマウント
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - app-network  # 네트워크 설정
+
+    # MariaDB 데이터베이스를 위한 서비스
+  db:
+    image: mariadb:10.7  # 사용할 MariaDB 이미지
+    container_name: laravel-vue-crm-db  # 컨테이너 이름
+    restart: unless-stopped  # 컨테이너가 중지되지 않는 한 자동으로 재시작
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: pam
+      MARIADB_USER: admin123
+      MARIADB_PASSWORD: password123
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d  # 초기화 스크립트를 컨테이너에 마운트
+    networks:
+      - app-network  # 네트워크 설정
+
+  # phpMyAdmin을 위한 서비스
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: laravel-vue-crm-phpmyadmin
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpass
+    ports:
+      - "8081:80"  
+    networks:
+      - app-network 
+    volumes:
+      - phpmyadmin-data:/sessions
+
+# 애플리케이션 네트워크 설정
+networks:
+  app-network:
+    driver: bridge  # 브리지 네트워크 드라이버 사용
+
+volumes:
+  db-data: # MariaDB 데이터 저장용 볼륨
+  phpmyadmin-data: # phpMyAdmin 세션 데이터 저장용 볼륨
