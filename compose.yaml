@@ -17,12 +17,12 @@ services:
       - .:/var/www # 現在ディレクトリをコンテナの /var/wwwでマウント
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - app-network  # 네트워크 설정
+      - app-network  # ネットワーク設定
 
-    # MariaDB 데이터베이스를 위한 서비스
+    # MariaDB データベースためのサービス
   db:
-    image: mariadb:10.7  # 사용할 MariaDB 이미지
-    container_name: laravel-vue-crm-db  # 컨테이너 이름
+    image: mariadb:10.7  # 利用する MariaDB イメージ
+    container_name: laravel-vue-crm-db  # コンテナの名前
     restart: unless-stopped  # 컨테이너가 중지되지 않는 한 자동으로 재시작
     tty: true
     ports:
@@ -36,9 +36,9 @@ services:
       - db-data:/var/lib/mysql
       - ./db-init:/docker-entrypoint-initdb.d  # 초기화 스크립트를 컨테이너에 마운트
     networks:
-      - app-network  # 네트워크 설정
+      - app-network  
 
-  # phpMyAdmin을 위한 서비스
+  # phpMyAdminためのサービス
   phpmyadmin:
     image: phpmyadmin:5.2
     container_name: laravel-vue-crm-phpmyadmin
@@ -55,10 +55,10 @@ services:
     volumes:
       - phpmyadmin-data:/sessions
 
-# 애플리케이션 네트워크 설정
+# アプリ ネットワーク 設定
 networks:
   app-network:
-    driver: bridge  # 브리지 네트워크 드라이버 사용
+    driver: bridge  # ブリッジ　ネットワーク ドライバーを使用
 
 volumes:
   db-data: # MariaDB 데이터 저장용 볼륨
