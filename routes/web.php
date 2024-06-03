@@ -37,8 +37,14 @@ Route::get(
 Route::post('/inertia', [InertiaTestController::class, 'store'])->name('inertia.store');
 
 Route::get('/inertia/create', [InertiaTestController::class, 'create'])->name('inertia.create');
+
+Route::get('/component-test', function () {
+    return Inertia::render('ComponentTest');
+});
 // 削除ルート
 Route::delete('/inertia/{id}', [InertiaTestController::class, 'delete'])->name('inertia.delete');
+
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
